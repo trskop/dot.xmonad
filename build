@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Copyright: (c) 2017 Peter Trško
+# License:   BSD3, see LICENSE file for details.
+
+declare -r progdir="$(dirname "$(readlink -m "$0")")"
+
+echo "progdir=${progdir}"
+
+(
+    # Making sure that we are in the project directory.
+    cd "${progdir}"
+
+    # Assuming that "${progdir}" is a directory where XMonad expects to find
+    # its executable.
+    stack --local-bin-path="${progdir}" install
+)

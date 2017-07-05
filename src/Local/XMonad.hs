@@ -1,0 +1,2 @@
+module Local.XMonad
+  where

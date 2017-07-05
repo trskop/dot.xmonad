@@ -1,0 +1,34 @@
+name:        local-xmonad
+version:     0.1.0.0
+synopsis:    XMonad with user configuration that uses Stack for compilation.
+description: See README.md for more details.
+author:      Peter Trško
+maintainer:  peter.trsko@gmail.com
+copyright:   (c) 2017 Peter Trško
+license:     BSD3
+category:    System
+#github:
+
+extra-source-files:
+  - ChangeLog.md
+  - README.md
+
+dependencies:
+  - base >=4.7 && <5
+  - xmonad >=0.13
+  - xmonad-contrib >=0.13
+
+ghc-options: -Wall
+
+library:
+  source-dirs: src
+  exposed-modules:
+    - Local.XMonad
+
+executables:
+  # This is the executable that XMonad expects to find in its config directory.
+  xmonad-x86_64-linux:
+    source-dirs: app
+    main: Main.hs
+    dependencies:
+      - local-xmonad
