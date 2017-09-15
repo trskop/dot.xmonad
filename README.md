@@ -25,10 +25,20 @@ Tested only on *Debian 9 (stretch)*.
 
 3. Run `${CONFIG_DIR}/build` script.
 
-4. Put a symlink to `${CONFIG_DIR}/xmonad-x86_64-linux` into a directory that
-   is in your `$PATH`, e.g. `$HOME/bin`. For example:
+4. Install vanila `xmonad` into a directory that is in a default `$PATH`, using
+   directories like `$HOME/bin` or `$HOME/.local/bin` may not work. Directory
+   like `/usr/loca/bin` may be the best place overall.
+
+    If you have rights to write into `/usr/local/bin` directly:
 
     ```Bash
-    cd ~/bin
-    ln -s ../.config/xmonad/xmonad-x86_64-linux xmonad
+    stack --local-bin-path=/usr/local/bin install xmonad
+    ```
+
+    Otherwise use something like:
+
+    ```Bash
+    stack --local-bin-path=. install xmonad
+    sudo mv xmonad /usr/local/bin
+    sudo chown root:root /usr/local/bin/xmonad
     ```
