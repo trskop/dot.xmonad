@@ -36,6 +36,7 @@ import XMonad
     , shiftMask
     , spawn
     , xK_0
+    , xK_Tab
     , xK_l
     , xK_r
     , xmonad
@@ -46,7 +47,12 @@ import XMonad.Layout.NoBorders (noBorders)
 import XMonad.ManageHook ((=?), (-->), appName, title)
 import XMonad.Hooks.ManageHelpers (doCenterFloat)
 import qualified XMonad.Operations as Operations (windows)
-import qualified XMonad.StackSet as StackSet (greedyView, shift)
+import qualified XMonad.StackSet as StackSet
+    ( focusDown
+    , focusUp
+    , greedyView
+    , shift
+    )
 
 import qualified Local.XMonad as Util (workspaceKeys)
 
@@ -83,7 +89,7 @@ myWorkspaces =
 
 --myKeys :: XConfig Layout -> Map (KeyMask, KeySym) (X ())
 myKeys :: XConfig a -> Map (KeyMask, KeySym) (X ())
-myKeys cfg@XConfig{modMask} = runCommands <> workspaceKeys
+myKeys cfg@XConfig{modMask} = runCommands <> workspaceKeys <> switchWindowFocus
   where
     -- mod-r        -- Run command.
     -- shift-mod-l  -- Lock screen.
@@ -107,3 +113,15 @@ myKeys cfg@XConfig{modMask} = runCommands <> workspaceKeys
                     ]
                 ]
             else []
+
+    -- alt-tab       -- Focus next window.
+    -- alt-shift-tab -- Focus previous window.
+    switchWindowFocus = Map.fromList
+        [ ((m, xK_Tab), Operations.windows f)
+        | (m, f) <-
+            [ (mod1Mask,               StackSet.focusDown)
+            , (mod3Mask,               StackSet.focusDown)
+            , (mod1Mask .|. shiftMask, StackSet.focusUp  )
+            , (mod3Mask .|. shiftMask, StackSet.focusUp  )
+            ]
+        ]
