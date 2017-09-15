@@ -14,9 +14,14 @@ Tested only on *Debian 9 (stretch)*.
     ```
 
 2. Clone this repository into `$HOME/.config/xmonad` (XDG style), or into
-   `$HOME/.xmonad`. Unfortunatelly current version of XMonad doesn't look for
-   build script in XDG compliant directory. For that reason it's a good idea to
-   do following:
+   `$HOME/.xmonad`.
+
+    ```Bash
+    git clone git@github.com:trskop/dot.xmonad.git ~/.config/xmonad
+    ```
+
+    Unfortunatelly current version of XMonad doesn't look for build script in
+    XDG compliant directory. For that reason it's a good idea to do following:
 
     ```Bash
     cd
