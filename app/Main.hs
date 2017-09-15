@@ -8,7 +8,7 @@ import Prelude ((+))
 
 import Control.Applicative ((*>))
 import Data.Bits ((.|.))
-import Data.Function (($))
+import Data.Function (($), (.))
 import Data.Monoid ((<>), mconcat)
 import Data.Ord ((<=))
 import Data.String (String)
@@ -17,8 +17,10 @@ import System.IO (IO)
 import Data.Map (Map)
 import qualified Data.Map as Map (fromList)
 import XMonad
-    ( KeyMask
+    ( Button
+    , KeyMask
     , KeySym
+    , Window
     , X
     , XConfig
         ( XConfig
@@ -27,9 +29,13 @@ import XMonad
         , logHook
         , manageHook
         , modMask
+        , mouseBindings
         , terminal
         , workspaces
         )
+    , button1
+    , button2
+    , button3
     , mod1Mask
     , mod3Mask
     , mod4Mask
@@ -46,12 +52,19 @@ import XMonad.Hooks.FadeInactive (fadeInactiveLogHook)
 import XMonad.Layout.NoBorders (noBorders)
 import XMonad.ManageHook ((=?), (-->), appName, title)
 import XMonad.Hooks.ManageHelpers (doCenterFloat)
-import qualified XMonad.Operations as Operations (windows)
+import qualified XMonad.Operations as Operations
+    ( focus
+    , mouseMoveWindow
+    , mouseResizeWindow
+    , windows
+    )
 import qualified XMonad.StackSet as StackSet
     ( focusDown
     , focusUp
+    , focusWindow
     , greedyView
     , shift
+    , shiftMaster
     )
 
 import qualified Local.XMonad as Util (workspaceKeys)
@@ -70,6 +83,7 @@ main = xmonad $ go xfceConfig
         , workspaces = myWorkspaces
         , modMask = mod4Mask
         , keys = myKeys <> keys -- Local definitions have priority.
+        , mouseBindings = myMouseBindings
         , terminal = "urxvt"
         }
 
@@ -125,3 +139,29 @@ myKeys cfg@XConfig{modMask} = runCommands <> workspaceKeys <> switchWindowFocus
             , (mod3Mask .|. shiftMask, StackSet.focusUp  )
             ]
         ]
+
+-- alt-button1 -- Set the window to floating mode and move by dragging.
+-- alt-button2 -- Raise the window to the top of the stack.
+-- alt-button3 -- Set the window to floating mode and resize by dragging.
+myMouseBindings :: XConfig a -> Map (KeyMask, Button) (Window -> X ())
+myMouseBindings _ = Map.fromList $ mconcat
+    [ [ ((m, button1), makeFloatingWindowAndDragIt)
+      , ((m, button2), raiseWindowToTheTopOfTheStack)
+      , ((m, button3), makeFloatingWindowAndResizeIt)
+      ]
+    | m <- [mod1Mask, mod3Mask]
+    ]
+  where
+    makeFloatingWindowAndDo action w = do
+        Operations.focus w
+        _ <- action w
+        Operations.windows StackSet.shiftMaster
+
+    makeFloatingWindowAndDragIt =
+        makeFloatingWindowAndDo Operations.mouseMoveWindow
+
+    makeFloatingWindowAndResizeIt =
+        makeFloatingWindowAndDo Operations.mouseResizeWindow
+
+    raiseWindowToTheTopOfTheStack =
+        Operations.windows . (StackSet.shiftMaster .) . StackSet.focusWindow
